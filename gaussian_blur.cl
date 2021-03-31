@@ -22,21 +22,24 @@ __kernel void gaussian_blur(
   float4 sum = 0.0 ;
 
   for (int offsetX = -1; offsetX <= 1; offsetX++) {
-
     for (int offsetY = -1; offsetY <= 1; offsetY++) {
-		int sampleX = idx+offsetX;
-		int sampleY = idy+offsetY;
-		sum += read_imagef(image, sampler,  (int2)(sampleX, sampleY));
-		
-	}
+      int sampleX = idx+offsetX;
+      int sampleY = idy+offsetY;
+      sum += read_imagef(image, sampler,  (int2)(sampleX, sampleY));
+    }
   }
 
   float4 blurResult=sum/(float4)(9.0);
   
   //Fade away
-  blurResult.x-=0.01;
-  blurResult.y-=0.01;
-  blurResult.z-=0.01;
+  float fadeStr = 0.008;
+  blurResult.x=max(0.0f,blurResult.x-fadeStr);
+  blurResult.y=max(0.0f,blurResult.y-fadeStr);
+  blurResult.z=max(0.0f,blurResult.z-fadeStr);
+
+  blurResult.w=1;
+
+
   
   write_imagef(blurredImage, pos.xy, blurResult);
 }
