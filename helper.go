@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/jgillich/go-opencl/cl"
 	"io/ioutil"
 	"log"
@@ -88,6 +89,16 @@ func makeCLContext() (*cl.Platform, *cl.Device, *cl.Context, *cl.CommandQueue) {
 	check(err)
 	return platform, device, context, queue
 }
+
+
+//Custom Log Writer
+type logWriter struct {
+}
+
+func (writer logWriter) Write(bytes []byte) (int, error) {
+	return fmt.Print(" [DEBUG] " + string(bytes))
+}
+
 
 func loadFile(fname string) string {
 	content, err := ioutil.ReadFile(fname)
