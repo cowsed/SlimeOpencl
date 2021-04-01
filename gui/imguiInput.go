@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/go-gl/glfw/v3.2/glfw"
-	"github.com/inkyblackness/imgui-go"
+	"github.com/inkyblackness/imgui-go/v2"
 )
 
 var glfwButtonIndexByID = map[glfw.MouseButton]int{

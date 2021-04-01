@@ -8,6 +8,8 @@ github.com/go-gl/glfw v0.0.0-20210311203641-62640a716d48 h1:2Ql7UigDMdlF+Ii12kdo
 github.com/go-gl/glfw v0.0.0-20210311203641-62640a716d48/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/inkyblackness/imgui-go v1.12.0 h1:uaxSM5SbbqCTGEx5ig7B2J78hM3g3az4f5NC6b4J7lY=
 github.com/inkyblackness/imgui-go v1.12.0/go.mod h1:S9wTWrw/HfxYPbOnqsbck9A6mxHRauv+Sy+bz5+BQwc=
+github.com/inkyblackness/imgui-go/v2 v2.7.0 h1:nP5WDlfO3hiyR4nqB0k/JoSxzmCw9K5peAGvVXg+WNk=
+github.com/inkyblackness/imgui-go/v2 v2.7.0/go.mod h1:cwQKd6U2onyuT5qwSC3DKCRsUE1SQ58TSVVpLoW/pDs=
 github.com/jgillich/go-opencl v0.0.0-20180608191952-a0efba3e5257 h1:CBOaGRHrueOBsM7vclAiWv4aecXkEAjGfYPGPgM9AdU=
 github.com/jgillich/go-opencl v0.0.0-20180608191952-a0efba3e5257/go.mod h1:zVb9psSAj+VpRI2Kp8J9sG437/VkNvl+l3dBMAUmGi4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

@@ -5,7 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/go-gl/gl/v3.2-core/gl"
-	"github.com/inkyblackness/imgui-go"
+	"github.com/inkyblackness/imgui-go/v2"
 )
 
 var TestString string = "Hello there!"

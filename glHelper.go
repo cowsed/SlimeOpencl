@@ -2,25 +2,49 @@ package main
 
 import (
 	"fmt"
-	"github.com/inkyblackness/imgui-go"
-	"os"
-
-	"github.com/go-gl/gl/v3.2-core/gl"
 	"github.com/cowsed/SlimeOpenCL/gui"
 	"github.com/cowsed/SlimeOpenCL/platform"
+	"github.com/go-gl/gl/v3.2-core/gl"
+	"github.com/inkyblackness/imgui-go/v2"
+	"image"
+	"os"
 )
+
+//Wam Bam memory leak
+//Investigate the siurce of this whihc i think is the imgui-go package
+func createImageTexture(img *image.RGBA) (uint32, error) {
+	// Upload texture to graphics system
+	var lastTexture int32
+	var handle uint32
+	gl.GetIntegerv(gl.TEXTURE_BINDING_2D, &lastTexture)
+	gl.GenTextures(1, &handle)
+	gl.BindTexture(gl.TEXTURE_2D, handle)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR) // minification filter
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR) // magnification filter
+	//This line specifically v
+	gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, int32(img.Bounds().Dx()), int32(img.Bounds().Dy()), 0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(&img.Pix[0]))
+	//gl.GenerateMipmap(gl.TEXTURE_2D)
+
+	// Restore state
+	gl.BindTexture(gl.TEXTURE_2D, uint32(lastTexture))
+
+	return handle, nil
+}
+
+
+
 
 var fragmentShaderSource = `#version 410
 in vec2 UV;
+uniform sampler2D image;
 
 out vec4 frag_colour;
 void main() {
-	frag_colour = vec4(UV.x,UV.y, 0, 1);
+	frag_colour = texture2D(image,UV*0.5-0.5);//+vec4(UV.x,UV.y, 0, 1);
 }
 `
 var vertexShaderSource = `#version 410
 in vec3 vp;
-
 in vec2 uv_in;
 out vec2 UV;
 
@@ -31,14 +55,14 @@ void main() {
 ` + "\x00"
 
 //Sets gl parameters to work with wacky imgui stuff
-func cleanUpAfterImgui(){
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-		gl.Enable(gl.DEPTH_TEST)
-		gl.DepthFunc(gl.LESS)
-		gl.ClearColor(1, 0, 0, 1)
+func cleanUpAfterImgui() {
+	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	gl.Enable(gl.DEPTH_TEST)
+	gl.DepthFunc(gl.LESS)
+	gl.ClearColor(1, 0, 0, 1)
 }
 
-func setupGL() (*platform.Platform, *imgui.Context, *gui.OpenGL3, *gui.ImguiInput) {
+func setupGL() (*platform.Platform, *imgui.Context, *gui.OpenGL3, *gui.ImguiInput, *Renderer) {
 	//Setup IMGUI
 	context, imguiInput := gui.NewImgui()
 
@@ -75,7 +99,7 @@ func setupGL() (*platform.Platform, *imgui.Context, *gui.OpenGL3, *gui.ImguiInpu
 	r.Init()
 	r.UpdateProgram(fragmentShaderSource, vertexShaderSource)
 
-	return platform, context, imguiRenderer, &imguiInput
+	return platform, context, imguiRenderer, &imguiInput, r
 }
 
 //Clipboard

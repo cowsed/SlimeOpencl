@@ -22,24 +22,6 @@ func makeAgentData(n, Width, Height int) []float32 {
 	return agentData
 }
 
-func createBlurMask(sigma float64) []float32 {
-	maskSize := int(math.Ceil(3.0 * sigma))
-	mask := make([]float32, (maskSize*2+1)*(maskSize*2+1))
-	var sum float32 = 0.0
-	for a := -maskSize; a < maskSize+1; a++ {
-		for b := -maskSize; b < maskSize+1; b++ {
-			var temp float32 = float32(math.Exp(-(float64(a*a+b*b) / (2 * sigma * sigma))))
-			sum += temp
-			mask[a+maskSize+(b+maskSize)*(maskSize*2+1)] = temp
-		}
-	}
-	// Normalize the mask
-	for i := 0; i < (maskSize*2+1)*(maskSize*2+1); i++ {
-		mask[i] = mask[i] / float32(sum)
-	}
-
-	return mask
-}
 
 func makeKernel(kernelName string, kernelSource string, context *cl.Context) *cl.Kernel {
 	log.Println("Creating Kernel", kernelName)

@@ -4,6 +4,7 @@ import (
 	"C"
 	"fmt"
 	"github.com/go-gl/gl/v3.2-core/gl"
+	"log"
 	"strings"
 	"unsafe"
 )
@@ -13,6 +14,7 @@ type Renderer struct {
 	vbo         uint32
 	points      []float32
 	program     uint32
+	texture     uint32
 	errorString string
 }
 
@@ -41,6 +43,7 @@ func (r *Renderer) UpdateProgram(fragSource, vertSource string) {
 	fragmentShader, err := compileShader(fragSource, gl.FRAGMENT_SHADER)
 	if err != nil {
 		r.errorString += err.Error()
+		log.Println(r.errorString)
 		return
 	}
 	//Check Fragment Shader Error
@@ -49,11 +52,13 @@ func (r *Renderer) UpdateProgram(fragSource, vertSource string) {
 	gl.AttachShader(prog, vertexShader)
 	gl.AttachShader(prog, fragmentShader)
 	gl.LinkProgram(prog)
+	
 
 	var isLinked int32
 	gl.GetProgramiv(prog, gl.LINK_STATUS, &isLinked)
-	fmt.Println("Program Link Error ", isLinked)
 	if isLinked == gl.FALSE {
+		fmt.Println("Program Link Error ", isLinked)
+
 		var maxLength int32
 		gl.GetProgramiv(fragmentShader, gl.INFO_LOG_LENGTH, &maxLength)
 
@@ -61,15 +66,22 @@ func (r *Renderer) UpdateProgram(fragSource, vertSource string) {
 		gl.GetShaderInfoLog(fragmentShader, maxLength, &maxLength, &infoLog[0])
 
 		r.errorString += fmt.Sprintln("Link Infolog{", string(infoLog), "}")
+		log.Println(r.errorString)
 		return
 	}
 
 	r.program = prog
 	r.errorString += "Shader Compiled Succesfully"
 }
-func (r *Renderer) Draw() {
+func (r *Renderer) Draw(scale float32) {
+	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 	gl.UseProgram(r.program)
 	gl.BindVertexArray(r.vao)
+	gl.BindTextureUnit(0, r.texture)
+
+	//name=make([]by)
+	
+	//gl.Uniform3f(loc, scale, scale, scale)
 	gl.DrawArrays(gl.TRIANGLES, 0, int32(len(r.points)/3))
 }
 func (r *Renderer) DrawToFramebuffer() uint32 {
@@ -103,14 +115,12 @@ func FrameBufferToFile(filename string, framebuffer uint32, width, height int) {
 	//Activate framebuffer
 	gl.BindFramebuffer(gl.FRAMEBUFFER, framebuffer)
 
-	gl.PixelStorei(gl.PACK_ALIGNMENT, 1);
+	gl.PixelStorei(gl.PACK_ALIGNMENT, 1)
 	//Read pixels
 	gl.ReadPixels(0, 0, int32(width), int32(height), format, xtype, pixels)
 	//size=int32(width*height*4)
 	print("Pixel data: ")
 	fmt.Println(pixels)
-
-
 
 	//Set back to defualt frame buffer
 	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)

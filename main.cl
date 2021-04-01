@@ -49,6 +49,8 @@ simulate (__global float *agentData,
 	  const unsigned int Height,
 	  const float dirChance, 
 	  const float dirWindow,
+	  const float SensorAngle,
+	  const float Speed, 
 	  __read_only image2d_t image_in,
 	  __write_only image2d_t image_out, 
 	  const unsigned int count,
@@ -73,7 +75,7 @@ simulate (__global float *agentData,
 
 
   
-  float sensorAngleSpacing = M_PI/4;
+  float sensorAngleSpacing = SensorAngle;//M_PI/4;
   bool draw = id==0;
   float4 senseFront = sense(draw, agent,0,image_in, Width, Height);
   float4 senseRight = sense(draw, agent,sensorAngleSpacing ,image_in, Width, Height);
@@ -104,8 +106,8 @@ simulate (__global float *agentData,
   
   
   //Move agents along
-  agent.pos.x += cos (agent.dir) * 1;
-  agent.pos.y += sin (agent.dir) * 1;
+  agent.pos.x += cos (agent.dir) * Speed;
+  agent.pos.y += sin (agent.dir) * Speed;
 
 
   
