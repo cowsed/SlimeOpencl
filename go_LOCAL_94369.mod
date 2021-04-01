@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 module github.com/cowsed/SlimeOpencl
-=======
-module github.com/cowsed/SlimeOpenCL
->>>>>>> 9729a9bbf532f349aef64b4183eb42d74b837223
 
 go 1.16
 
