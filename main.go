@@ -25,19 +25,22 @@ import (
 const Width = 80 * 8
 const Height = 60 * 8
 const frames = 120000
-const NumAgents = 8192 * 4
+
+var NumAgents int32 = 8192 * 4
+var tempNumAgents int32 = NumAgents
 
 var dolog = true
 
-var dirWindow float32 = 0.1
-var dirChance float32 = 0.1
+var dirWindow float32 = 0.7
+var dirChance float32 = 0.7
 
 var fadeStrength float32 = 0.008
 var SensorAngle float32 = math.Pi / 4.0
 var diffuseStrength float32 = 0.5
 var agentSpeed float32 = 1
 
-var drawScale float32 = 1
+var winPos [3]float32
+var winScale [3]float32
 
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
@@ -70,7 +73,7 @@ func main() {
 	check(err)
 
 	//Generate Test Data
-	agentData := makeAgentData(NumAgents, Width, Height)
+	agentData := makeAgentData(int(NumAgents), Width, Height)
 
 	//Create Buffers
 	agentBuffer, err := contextCl.CreateEmptyBuffer(cl.MemReadWrite, 4*len(agentData))
@@ -92,7 +95,7 @@ func main() {
 	check(err)
 
 	//Adjust Global size to make it work
-	global := NumAgents
+	global := int(NumAgents)
 	d := len(agentData) / 3 % local
 	if d != 0 {
 		global += local - d
@@ -117,7 +120,10 @@ func main() {
 
 	frameNum := 0
 	tex, err := createImageTexture(Image1)
+	r.texture = tex
+
 	check(err)
+	defer gl.DeleteTextures(1, &tex)
 
 	for !platform.ShouldStop() {
 		//Do Window Stuff
@@ -164,19 +170,17 @@ func main() {
 		//fblur, _ := os.Create(fmt.Sprintf("Output/blur%d.png", frameNum))
 		//png.Encode(fblur, Image1)
 
-
 		//HERE COMES THE MEMORY LEAK
-		gl.DeleteTextures(1, &(tex))
-		tex, err := createImageTexture(Image1)
-		r.texture = tex
-
+		gl.BindTexture(gl.TEXTURE_2D, tex)
+		gl.TexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, int32(Image1.Bounds().Dx()), int32(Image1.Bounds().Dy()), 0, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(&Image1.Pix[0]))
 		check(err)
 		//Imgui stuff
 		imgui.Begin("Parameter Editor")
-		
 
 		imgui.Text(fmt.Sprintf("Frame: %d", frameNum))
-		//imgui.Image(imgui.TextureID(tex),imgui.Vec2{Width/2,Height/2})
+		imgui.SliderFloat3("Position", &winPos, 0, 1)
+		imgui.SliderFloat3("Scale", &winScale, 0, 1)
+
 		imgui.SliderFloat("Fade Strength", &fadeStrength, 0, 1.0)
 		imgui.SliderFloat("Diffuse Strength", &diffuseStrength, 0, 1.0)
 
@@ -185,7 +189,14 @@ func main() {
 
 		imgui.SliderFloat("Turn Window", &dirWindow, 0, 1)
 
-		
+		imgui.Separator()
+		imgui.Text("These need a reset to take effect")
+		imgui.DragIntV("Num Agents", &tempNumAgents, 100, 0, 2_147_483_647, "%d")
+
+		if imgui.Button("Reset Agents") {
+			agentBuffer = resetAll(contextCl, queue, agentBuffer)
+		}
+
 		if imgui.Button("Log") {
 			if *memprofile != "" || dolog {
 				fmt.Println("Write to profile")
@@ -207,7 +218,7 @@ func main() {
 
 		//Clean up after imgui
 		cleanUpAfterImgui()
-		r.Draw(drawScale)
+		r.Draw(winPos, winScale)
 
 		imguiRenderer.Render(platform.DisplaySize(), platform.FramebufferSize(), imgui.RenderedDrawData())
 
@@ -216,4 +227,18 @@ func main() {
 
 	}
 
+}
+
+func resetAll(contextCl *cl.Context, queue *cl.CommandQueue, agentBuffer *cl.MemObject) *cl.MemObject {
+	NumAgents = tempNumAgents
+	log.Println("resseting")
+	agentData := makeAgentData(int(NumAgents), Width, Height)
+	agentBuffer.Release()
+
+	agentBuffer, err := contextCl.CreateEmptyBuffer(cl.MemReadWrite, 4*len(agentData))
+	check(err)
+	e, err := queue.EnqueueWriteBufferFloat32(agentBuffer, true, 0, agentData[:], nil)
+	check(err)
+	e.Release()
+	return agentBuffer
 }

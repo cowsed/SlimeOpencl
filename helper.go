@@ -6,17 +6,18 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"math/rand"
 )
 
 func makeAgentData(n, Width, Height int) []float32 {
 	//Positionx/ posy, direction
 	agentData := make([]float32, 3*n)
 	for i := 0; i < n*3; i += 3 {
-		a := float32(i) / float32(n) * 2 * math.Pi
-		r := 100.0
+		a := (float32(i)/3.0) / float32(n) * 2 * math.Pi
+		r := 0.0 * rand.Float64()
 		agentData[i] = float32(Width/2) + float32(math.Cos(float64(a))*r)
 		agentData[i+1] = float32(Height/2) + float32(math.Sin(float64(a))*r)
-		agentData[i+2] = a
+		agentData[i+2] = a+math.Pi
 
 	}
 	return agentData

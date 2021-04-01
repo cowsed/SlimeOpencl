@@ -11,6 +11,7 @@ import (
 )
 
 //Wam Bam memory leak
+//Still dont know why this leaks and doesnt release correclyl when gl.DeleteTextures is called but found a way around it
 //Investigate the siurce of this whihc i think is the imgui-go package
 func createImageTexture(img *image.RGBA) (uint32, error) {
 	// Upload texture to graphics system
@@ -30,9 +31,6 @@ func createImageTexture(img *image.RGBA) (uint32, error) {
 
 	return handle, nil
 }
-
-
-
 
 var fragmentShaderSource = `#version 410
 in vec2 UV;

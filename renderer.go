@@ -13,6 +13,7 @@ type Renderer struct {
 	vao         uint32
 	vbo         uint32
 	points      []float32
+	frag, vert  uint32
 	program     uint32
 	texture     uint32
 	errorString string
@@ -39,13 +40,14 @@ func (r *Renderer) UpdateProgram(fragSource, vertSource string) {
 		//Only panic here because this should never happen
 		panic(err)
 	}
-
+	r.vert = vertexShader
 	fragmentShader, err := compileShader(fragSource, gl.FRAGMENT_SHADER)
 	if err != nil {
 		r.errorString += err.Error()
 		log.Println(r.errorString)
 		return
 	}
+	r.frag = fragmentShader
 	//Check Fragment Shader Error
 
 	prog := gl.CreateProgram()
@@ -72,16 +74,24 @@ func (r *Renderer) UpdateProgram(fragSource, vertSource string) {
 
 	r.program = prog
 	r.errorString += "Shader Compiled Succesfully"
+	log.Println(r.errorString)
 }
-func (r *Renderer) Draw(scale float32) {
+func (r *Renderer) Draw(pos, scale[3]float32) {
 	gl.BindFramebuffer(gl.FRAMEBUFFER, 0)
 	gl.UseProgram(r.program)
 	gl.BindVertexArray(r.vao)
 	gl.BindTextureUnit(0, r.texture)
 
-	//name=make([]by)
-	
-	//gl.Uniform3f(loc, scale, scale, scale)
+	/*
+	loc := gl.GetUniformLocation(r.vert, gl.Str("scale"+"\x00"))
+	gl.Uniform3f(loc, scale[0], scale[1], scale[2])
+	log.Println(loc)
+
+	loc = gl.GetUniformLocation(r.vert, gl.Str("pos"+"\x00"))
+	gl.Uniform3f(loc, scale[0], scale[1], scale[2])
+	log.Println(loc)
+*/
+
 	gl.DrawArrays(gl.TRIANGLES, 0, int32(len(r.points)/3))
 }
 func (r *Renderer) DrawToFramebuffer() uint32 {
