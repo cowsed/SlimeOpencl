@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 module github.com/cowsed/SlimeOpencl
-=======
-module github.com/cowsed/SlimeOpenCL
->>>>>>> 9729a9bbf532f349aef64b4183eb42d74b837223
 
 go 1.16
-
-replace github.com/cowsed/OpenCLSlime => /home/rich/go/src/github.com/cowsed/SlimeOpenCL
 
 require (
 	github.com/cowsed/SlimeOpenCL v0.0.0-20210401020232-9729a9bbf532
