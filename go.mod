@@ -1,7 +1,7 @@
-module v4
+module github.com/cowsed/OpenCLSlime
 
 go 1.16
 
-replace(
-    
+require(
+
 )
