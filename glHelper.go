@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/go-gl/gl/v3.2-core/gl"
-	"github.com/cowsed/OpenCLSlime/gui"
-	"github.com/cowsed/OpenCLSlime/platform"
+	"github.com/cowsed/SlimeOpenCL/gui"
+	"github.com/cowsed/SlimeOpenCL/platform"
 )
 
 var fragmentShaderSource = `#version 410

@@ -1,3 +1,3 @@
-module v4
+module v3
 
 go 1.16

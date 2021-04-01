@@ -8,7 +8,7 @@ import (
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/inkyblackness/imgui-go"
 
-	"github.com/cowsed/OpenCLSlime/gui"
+	"github.com/cowsed/SlimeOpenCL/gui"
 	"image/png"
 	"log"
 	"os"
