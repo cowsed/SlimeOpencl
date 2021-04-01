@@ -1,4 +1,4 @@
-module github.com/cowsed/OpenCLSlime
+module github.com/cowsed/SlimeOpenCL
 
 go 1.16
 
